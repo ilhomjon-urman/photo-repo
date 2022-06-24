@@ -43,14 +43,17 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
+    ],
+    'modules'    => [
+        'utility' => [
+            'class' => 'c006\utility\migration\Module',
+        ],
     ],
     'params' => $params,
 ];
