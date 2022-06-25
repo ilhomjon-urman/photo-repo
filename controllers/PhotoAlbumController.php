@@ -2,11 +2,16 @@
 
 namespace app\controllers;
 
+use Yii;
 use app\models\PhotoAlbum;
 use app\models\PhotoAlbumSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\PhotoFiles;
+use yii\web\UploadedFile;
+
+
 
 /**
  * PhotoAlbumController implements the CRUD actions for PhotoAlbum model.
@@ -115,6 +120,54 @@ class PhotoAlbumController extends Controller
 
         return $this->redirect(['index']);
     }
+
+    public function actionUpload($id)
+    {
+    
+        $model = new PhotoFiles();
+
+        if ($model->load(Yii::$app->request->post())) {
+    
+            $model->file = UploadedFile::getInstance($model, 'file');
+
+            $newFileName = transliterator_transliterate('Any-Latin; Latin-ASCII; Lower();', $model->file->name);
+
+            $fileName = $newFileName . '.' . $model->file->extension;
+
+            $ifPhoto = PhotoFiles::findOne(['changed_name'=>$fileName]);
+
+            if ($ifPhoto) {
+                $fileName = $newFileName . '-' . md5(time()) . '.' . $model->file->extension;
+            }
+
+            $model->original_name = $model->file->name;
+            $model->changed_name = $fileName;
+            $model->album_id = $id;
+            $model->created_at = time();
+
+            if ($model->file && $model->validate()) {
+                if($model->save()) {
+                    $model->file->saveAs(Yii::$app->basePath . '/web/uploads/' . $model->changed_name);
+                    return $this->redirect('/photo-album/view?id='.$id);
+                }
+            }
+        }
+
+        return $this->render('upload', [
+            'model' => $model,
+        ]);
+
+    }
+
+
+    public function actionDeleteFile($id)
+    {
+        $model = PhotoFiles::findOne($id);
+        $albumId = $model->album->id;
+        $model->delete();
+        return $this->redirect('/photo-album/view?id='.$albumId);
+    }
+
 
     /**
      * Finds the PhotoAlbum model based on its primary key value.
