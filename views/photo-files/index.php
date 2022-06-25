@@ -31,15 +31,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'album_id',
+            'album.name:text:Photo Album Name',
             'original_name',
             'changed_name',
             'created_at',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, PhotoFiles $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
-            ],
+
+            ['class' => 'yii\grid\ActionColumn'],
+
         ],
     ]); ?>
 

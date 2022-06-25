@@ -17,6 +17,9 @@ use Yii;
  */
 class PhotoFiles extends \yii\db\ActiveRecord
 {
+
+    public $file;
+
     /**
      * {@inheritdoc}
      */
@@ -35,6 +38,13 @@ class PhotoFiles extends \yii\db\ActiveRecord
             [['album_id', 'created_at'], 'integer'],
             [['original_name', 'changed_name'], 'string', 'max' => 1024],
             [['album_id'], 'exist', 'skipOnError' => true, 'targetClass' => PhotoAlbum::className(), 'targetAttribute' => ['album_id' => 'id']],
+            [
+                ['file'], 'file', 
+                'maxSize' => 5242880,  // limit 5mb => 5(mb) * 1024(kb) * 1024(b),
+                'extensions' => 'png, jpg', 
+                'skipOnEmpty' => true
+            ],
+
         ];
     }
 
